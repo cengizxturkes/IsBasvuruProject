@@ -23,8 +23,9 @@ public class CachingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, 
         _cacheSettings = configuration.GetSection("CacheSettings").Get<CacheSettings>();
     }
 
-    public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken,
-                                        RequestHandlerDelegate<TResponse> next)
+   
+
+    public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
         TResponse response;
         if (request.BypassCache) return await next();
@@ -33,7 +34,7 @@ public class CachingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, 
         {
             response = await next();
             TimeSpan? slidingExpiration =
-                request.SlidingExpiration ?? TimeSpan.FromDays(_cacheSettings.SlidingExpiration);
+                request.SlidingExpiration ?? TimeSpan.FromSeconds(3);
             DistributedCacheEntryOptions cacheOptions = new() { SlidingExpiration = slidingExpiration };
             byte[] serializeData = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(response));
             await _cache.SetAsync(request.CacheKey, serializeData, cacheOptions, cancellationToken);
