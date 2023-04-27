@@ -13,6 +13,10 @@ using MailKit.Net.Smtp;
 
 using MailKit.Security;
 using SmtpClient = MailKit.Net.Smtp.SmtpClient;
+using MimeKit.Text;
+using Org.BouncyCastle.Asn1.Ocsp;
+using static Org.BouncyCastle.Math.EC.ECCurve;
+using Microsoft.Extensions.Configuration;
 
 namespace Application.Services
 {
@@ -24,15 +28,24 @@ namespace Application.Services
     public class MailService : IMailService
     {
         private readonly MailSettings _mailSettings;
+        private readonly IConfiguration _config;
         public MailService(IOptions<MailSettings> mailSettings)
         {
             _mailSettings = mailSettings.Value;
         }
+
+        public MailService(MailSettings mailSettings, IConfiguration config)
+        {
+            _mailSettings = mailSettings;
+            _config = config;
+        }
+
         public async Task SendEmailAsync(MailRequest mailRequest)
         {
             //mailRequest.ToEmail
             //mailRequest.Subject
             //mailRequest.Body
+
             var email = new MimeMessage();
             email.Sender = MailboxAddress.Parse(_mailSettings.Mail);
             email.To.Add(MailboxAddress.Parse(mailRequest.ToEmail));
@@ -53,15 +66,18 @@ namespace Application.Services
                     }
                 }
             }
+
             builder.HtmlBody = mailRequest.Body;
             email.Body = builder.ToMessageBody();
             using var smtp = new SmtpClient();
-            smtp.Connect(_mailSettings.Host, _mailSettings.Port, SecureSocketOptions.StartTls);
+            smtp.Connect("smtp.gmail.com", 587, false);
+            //smtp.Connect(_mailSettings.Host, _mailSettings.Port, SecureSocketOptions.StartTls);
             smtp.Authenticate(_mailSettings.Mail, _mailSettings.Password);
             await smtp.SendAsync(email);
 
 
             smtp.Disconnect(true);
+     
         }
     }
     public class MailSettings
