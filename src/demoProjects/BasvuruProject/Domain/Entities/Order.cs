@@ -14,8 +14,7 @@ namespace Domain.Entities
         public string CustomerMail { get; set; }
         public int CustomerGSM { get; set; }
         public int TotalAmount { get; set; }
-        public int ProductId { get; set; }
-        [ForeignKey("ProductId")]
-        public virtual Product  Product { get; set; }
+        public virtual IEnumerable<OrderItem> OrderItems { get; set; }
+
     }
 }

@@ -54,7 +54,7 @@ namespace Application.Services
 
                 foreach (var item in _orders)
                 {
-                    _mailService.SendEmailAsync(new MailRequest() { Body = "Sayın müşteri sipariiniz alındı tutarı:" + item.Product.UnitPrice, Subject = "Siparişiniz alındı", ToEmail = item.CustomerMail });
+                    _mailService.SendEmailAsync(new MailRequest() { Body = "Sayın müşteri sipariiniz alındı tutarı:" + item.OrderItems, Subject = "Siparişiniz alındı", ToEmail = item.CustomerMail });
                 }
                 _orders.Clear();
             }

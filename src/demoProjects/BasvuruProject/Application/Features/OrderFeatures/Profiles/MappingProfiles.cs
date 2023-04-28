@@ -21,6 +21,8 @@ namespace Application.Features.OrderFeatures.Profiles
             CreateMap<Order, CreatedOrderResponse>().ReverseMap();
             CreateMap<Order, CreateOrderCommand>().ReverseMap();
             CreateMap<Order, OrderItem>().ReverseMap();
+            CreateMap<OrderItem, OrderItemDto>().ReverseMap();
+            CreateMap<OrderItemDto, OrderItem>().ReverseMap();
 
         }
     }
