@@ -69,9 +69,9 @@ namespace Application.Features.OrderFeatures.Commands
                     await _orderItemsRepository.AddAsync(mappedOrderItem);
                     mappedOrderItem.Product = _productRepository.Get(x => x.Id == item.ProductID);
                     createdOrderDto.OrderItems.Append(_mapper.Map<OrderItemDto>(mappedOrderItem));
-
+                     _mailQueue.AddQueue(mappedOrder, mappedOrderItem);
                 }
-                _mailQueue.AddQueue(mappedOrder);
+             
                 return createdOrderDto;
             }
         }
