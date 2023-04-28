@@ -3,6 +3,7 @@ using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using RabbitMQ.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -67,8 +68,18 @@ namespace Application.Services
                         
 
                     }
+                    //TODO
+                    var factory = new ConnectionFactory();
+                    factory.Uri = new Uri("amqps://yeaixqmp:RmmVEHoOcK-G6tcoj0fuillwq5uyiaF7@cow.rmq2.cloudamqp.com/yeaixqmp");
+                    var connection = factory.CreateConnection();
+
+                    var channel = connection.CreateModel();
+                    channel.QueueDeclare("mesaj kuyruk", true, false, false);
                     string mesaj = String.Concat("Siparişiniz Alındı Siparişinizdeki ürünler Aşağıda Listelenmiştir", product,"\nsipariş fiyatı:",price,"Bizi Tercih ettiğiniz için teşekkür  ederiz");
+                    var message = Encoding.UTF8.GetBytes(mesaj);
+                    channel.BasicPublish(String.Empty,"mesaj",null,message);
                     _mailService.SendEmailAsync(new MailRequest() { Body = mesaj, Subject = "Siparişiniz alındı", ToEmail = item.CustomerMail });
+
                 }
                 _orders.Clear();
             }
